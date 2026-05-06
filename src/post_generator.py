@@ -1,34 +1,37 @@
-from llm_helper import llm
-from few_shot import FewShotPosts
+from src.llm_helper import get_llm_response
+from src.few_shot import FewShotPosts
 
 few_shot = FewShotPosts()
 
 
 def get_length_str(length):
-    return {
-        "Short": "1-5 lines",
-        "Medium": "6-10 lines",
-        "Long": "11-15 lines"
-    }[length]
+    if length == "Short":
+        return "1 to 5 lines"
+    elif length == "Medium":
+        return "6 to 10 lines"
+    else:
+        return "11 to 15 lines"
 
 
 def get_prompt(length, language, tag):
     length_str = get_length_str(length)
 
     prompt = f"""
-    Generate a LinkedIn post.
+Generate a LinkedIn post.
 
-    Topic: {tag}
-    Length: {length_str}
-    Language: {language}
+Topic: {tag}
+Length: {length_str}
+Language: {language}
 
-    If Hinglish, use English script.
-    """
+If language is Hinglish, use English script.
+
+No preamble.
+"""
 
     examples = few_shot.get_filtered_posts(length, language, tag)
 
-    if examples:
-        prompt += "\nUse style from examples:\n"
+    if len(examples) > 0:
+        prompt += "\nUse writing style similar to below examples:\n"
 
     for i, post in enumerate(examples[:2]):
         prompt += f"\nExample {i+1}:\n{post['text']}\n"
@@ -36,11 +39,7 @@ def get_prompt(length, language, tag):
     return prompt
 
 
+# ✅ THIS FUNCTION WAS MISSING / BROKEN
 def generate_post(length, language, tag):
     prompt = get_prompt(length, language, tag)
-    response = llm.invoke(prompt)
-    return response.content
-
-
-if __name__ == "__main__":
-    print(generate_post("Medium", "English", "Motivation"))
+    return get_llm_response(prompt)

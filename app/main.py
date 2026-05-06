@@ -2,11 +2,13 @@ import streamlit as st
 import sys
 import os
 
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 # Fix import path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "src")))
 
-from few_shot import FewShotPosts
-from post_generator import generate_post
+from src.few_shot import FewShotPosts
+from src.post_generator import generate_post
 
 
 def main():
